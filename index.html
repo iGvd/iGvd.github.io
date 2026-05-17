@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ігор Гведде - AI Systems Builder</title>
-<link rel="icon" type="image/png" href="/icon.png?v=4">
-<link rel="shortcut icon" type="image/png" href="/icon.png?v=4">
-<link rel="apple-touch-icon" href="/icon.png?v=4">
+<link rel="icon" type="image/png" href="icon.png">
+<link rel="shortcut icon" type="image/png" href="icon.png">
+<link rel="apple-touch-icon" href="icon.png">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Space+Mono:wght@400;700&display=swap');
   :root{--bg:#080808;--fg:#e8e8e8;--dim:#444;--mid:#777;--accent:#fff;--line:#1e1e1e;--scan:rgba(255,255,255,0.012)}
@@ -16,78 +16,167 @@
   body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,var(--scan) 2px,var(--scan) 4px);pointer-events:none;z-index:100}
   body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,0.65) 100%);pointer-events:none;z-index:99}
 
-  /* BACKGROUND: BIOS DEPTH GRID + SUBTLE GLITCH
-     Safe layer: no images, no JS, no clicks blocked. Text stays above. */
+
+
+  /* BACKGROUND: BIOS SCI-FI GRID + TEXT-SAFE GLITCH */
   #glitch-grid{
     position:fixed;
-    inset:-8vh -8vw;
+    inset:0;
     z-index:0;
     pointer-events:none;
     overflow:hidden;
-    opacity:.30;
-    filter:contrast(1.08) brightness(.9);
+    opacity:.62;
+    isolation:isolate;
+  }
+
+  #glitch-grid::before{
+    content:'';
+    position:absolute;
+    inset:0;
+    background:
+      radial-gradient(ellipse at center, transparent 0%, transparent 44%, rgba(0,0,0,.30) 72%, rgba(0,0,0,.78) 100%),
+      linear-gradient(180deg, rgba(0,0,0,.20), rgba(0,0,0,.92));
+    z-index:4;
   }
 
   .gg-layer{
     position:absolute;
-    inset:0;
-    background:
-      radial-gradient(ellipse at 50% 58%, transparent 0 38%, rgba(255,255,255,.038) 39%, transparent 41%, transparent 54%, rgba(255,255,255,.024) 55%, transparent 57%),
-      repeating-linear-gradient(90deg, rgba(255,255,255,.044) 0 1px, transparent 1px 118px),
-      repeating-linear-gradient(0deg, rgba(255,255,255,.034) 0 1px, transparent 1px 82px),
-      linear-gradient(116deg, transparent 0 47%, rgba(255,255,255,.052) 48%, transparent 49% 100%),
-      linear-gradient(64deg, transparent 0 50%, rgba(255,255,255,.033) 51%, transparent 52% 100%);
-    transform:perspective(760px) rotateX(63deg) translateY(19vh) scale(1.42);
-    transform-origin:center bottom;
+    inset:-18vh -18vw;
     will-change:transform,opacity,clip-path;
   }
 
+  .gg-base,
+  .gg-slice{
+    background:
+      radial-gradient(circle at 50% 75%, rgba(255,255,255,.18) 0 1px, transparent 2px),
+      linear-gradient(115deg, transparent 0 48.7%, rgba(255,255,255,.16) 49%, transparent 49.4% 100%),
+      linear-gradient(65deg, transparent 0 49%, rgba(255,255,255,.10) 49.25%, transparent 49.7% 100%),
+      repeating-linear-gradient(90deg, rgba(255,255,255,.105) 0 1px, transparent 1px 92px),
+      repeating-linear-gradient(0deg, rgba(255,255,255,.075) 0 1px, transparent 1px 70px);
+    background-size:
+      92px 70px,
+      100% 100%,
+      100% 100%,
+      92px 70px,
+      92px 70px;
+    transform:perspective(760px) rotateX(64deg) translateY(23vh) scale(1.58);
+    transform-origin:center bottom;
+  }
+
   .gg-base{
-    opacity:.62;
-    animation:gridDrift 22s linear infinite;
+    opacity:.48;
+    animation:gridDrift 18s linear infinite;
   }
 
-  .gg-slice-a,
-  .gg-slice-b,
-  .gg-flash{
+  .gg-noise{
+    z-index:2;
+    opacity:.18;
+    background:
+      repeating-linear-gradient(0deg, transparent 0 6px, rgba(255,255,255,.06) 6px 7px, transparent 7px 12px),
+      repeating-linear-gradient(90deg, transparent 0 18px, rgba(255,255,255,.025) 18px 19px, transparent 19px 42px);
+    mix-blend-mode:screen;
+    animation:noiseJitter 5.4s steps(2,end) infinite;
+  }
+
+  .gg-slice{
+    z-index:3;
     opacity:0;
+    mix-blend-mode:screen;
+    filter:brightness(1.55) contrast(1.15);
   }
 
-  .gg-slice-a{animation:bgGlitchA 7.4s steps(1,end) infinite}
-  .gg-slice-b{animation:bgGlitchB 10.8s steps(1,end) infinite}
-  .gg-flash{animation:bgGlitchFlash 13.5s steps(1,end) infinite}
+  .gg-slice-a{animation:bgGlitchA 3.6s steps(1,end) infinite}
+  .gg-slice-b{animation:bgGlitchB 5.1s steps(1,end) infinite}
+  .gg-slice-c{animation:bgGlitchC 6.8s steps(1,end) infinite}
+
+  .gg-hardline{
+    z-index:4;
+    opacity:0;
+    mix-blend-mode:screen;
+    background:
+      repeating-linear-gradient(0deg, transparent 0 18px, rgba(255,255,255,.16) 18px 19px, transparent 19px 42px),
+      linear-gradient(90deg, transparent 0 14%, rgba(255,255,255,.12) 14.4%, transparent 15.2% 100%);
+    animation:bgHardline 4.35s steps(1,end) infinite;
+  }
+
+  .gg-flash{
+    z-index:5;
+    opacity:0;
+    background:
+      linear-gradient(90deg, transparent 0 7%, rgba(255,255,255,.20) 7.4%, transparent 8.6% 100%),
+      linear-gradient(180deg, transparent 0 48%, rgba(255,255,255,.18) 48.2%, transparent 49.6% 100%);
+    animation:bgGlitchFlash 5.8s steps(1,end) infinite;
+  }
 
   @keyframes gridDrift{
-    0%{transform:perspective(760px) rotateX(63deg) translateY(19vh) translateX(0) scale(1.42)}
-    50%{transform:perspective(760px) rotateX(63deg) translateY(17vh) translateX(-1.2vw) scale(1.44)}
-    100%{transform:perspective(760px) rotateX(63deg) translateY(19vh) translateX(0) scale(1.42)}
+    0%{transform:perspective(760px) rotateX(64deg) translateY(23vh) translateX(0) scale(1.58)}
+    100%{transform:perspective(760px) rotateX(64deg) translateY(23vh) translateX(-92px) scale(1.58)}
+  }
+
+  @keyframes noiseJitter{
+    0%,100%{transform:translate3d(0,0,0)}
+    38%{transform:translate3d(3px,-1px,0)}
+    39%{transform:translate3d(-4px,1px,0)}
+    40%{transform:translate3d(0,0,0)}
+    72%{transform:translate3d(-2px,0,0)}
+    73%{transform:translate3d(4px,1px,0)}
+    74%{transform:translate3d(0,0,0)}
   }
 
   @keyframes bgGlitchA{
-    0%,88%,100%{opacity:0;clip-path:polygon(0 0,100% 0,100% 0,0 0);transform:perspective(760px) rotateX(63deg) translateY(19vh) scale(1.42)}
-    89%{opacity:.20;clip-path:polygon(0 18%,100% 18%,100% 22%,0 22%);transform:perspective(760px) rotateX(63deg) translateY(19vh) translateX(12px) scale(1.42)}
-    90%{opacity:.13;clip-path:polygon(0 47%,100% 47%,100% 51%,0 51%);transform:perspective(760px) rotateX(63deg) translateY(19vh) translateX(-10px) scale(1.42)}
-    91%{opacity:.17;clip-path:polygon(0 69%,100% 69%,100% 72%,0 72%);transform:perspective(760px) rotateX(63deg) translateY(19vh) translateX(7px) scale(1.42)}
+    0%,20%,100%{opacity:0;clip-path:polygon(0 0,100% 0,100% 0,0 0)}
+    21%{opacity:.86;clip-path:polygon(0 12%,100% 12%,100% 20%,0 20%);transform:perspective(760px) rotateX(64deg) translateY(23vh) translateX(34px) scale(1.58)}
+    22%{opacity:.62;clip-path:polygon(0 42%,100% 42%,100% 46%,0 46%);transform:perspective(760px) rotateX(64deg) translateY(23vh) translateX(-38px) scale(1.58)}
+    23%{opacity:.78;clip-path:polygon(0 67%,100% 67%,100% 78%,0 78%);transform:perspective(760px) rotateX(64deg) translateY(23vh) translateX(22px) scale(1.58)}
+    24%{opacity:.42;clip-path:polygon(0 84%,100% 84%,100% 87%,0 87%);transform:perspective(760px) rotateX(64deg) translateY(23vh) translateX(-18px) scale(1.58)}
+    25%{opacity:0;clip-path:polygon(0 0,100% 0,100% 0,0 0)}
   }
 
   @keyframes bgGlitchB{
-    0%,94%,100%{opacity:0;clip-path:polygon(0 0,100% 0,100% 0,0 0);transform:perspective(760px) rotateX(63deg) translateY(19vh) scale(1.42)}
-    95%{opacity:.14;clip-path:polygon(0 29%,100% 29%,100% 31%,0 31%);transform:perspective(760px) rotateX(63deg) translateY(19vh) translateX(-16px) scale(1.42)}
-    96%{opacity:.19;clip-path:polygon(0 59%,100% 59%,100% 65%,0 65%);transform:perspective(760px) rotateX(63deg) translateY(19vh) translateX(9px) scale(1.42)}
+    0%,55%,100%{opacity:0;clip-path:polygon(0 0,100% 0,100% 0,0 0)}
+    56%{opacity:.70;clip-path:polygon(0 26%,100% 26%,100% 31%,0 31%);transform:perspective(760px) rotateX(64deg) translateY(23vh) translateX(-44px) scale(1.58)}
+    57%{opacity:.88;clip-path:polygon(0 50%,100% 50%,100% 59%,0 59%);transform:perspective(760px) rotateX(64deg) translateY(23vh) translateX(42px) scale(1.58)}
+    58%{opacity:.52;clip-path:polygon(0 73%,100% 73%,100% 77%,0 77%);transform:perspective(760px) rotateX(64deg) translateY(23vh) translateX(-24px) scale(1.58)}
+    59%{opacity:0;clip-path:polygon(0 0,100% 0,100% 0,0 0)}
+  }
+
+  @keyframes bgGlitchC{
+    0%,82%,100%{opacity:0;clip-path:polygon(0 0,100% 0,100% 0,0 0)}
+    83%{opacity:.76;clip-path:polygon(0 8%,100% 8%,100% 11%,0 11%);transform:perspective(760px) rotateX(64deg) translateY(23vh) translateX(52px) scale(1.58)}
+    84%{opacity:.68;clip-path:polygon(0 34%,100% 34%,100% 36%,0 36%);transform:perspective(760px) rotateX(64deg) translateY(23vh) translateX(-46px) scale(1.58)}
+    85%{opacity:.84;clip-path:polygon(0 61%,100% 61%,100% 66%,0 66%);transform:perspective(760px) rotateX(64deg) translateY(23vh) translateX(30px) scale(1.58)}
+    86%{opacity:0;clip-path:polygon(0 0,100% 0,100% 0,0 0)}
+  }
+
+  @keyframes bgHardline{
+    0%,44%,100%{opacity:0;clip-path:polygon(0 0,100% 0,100% 0,0 0);transform:translate3d(0,0,0)}
+    45%{opacity:.34;clip-path:polygon(0 18%,100% 18%,100% 24%,0 24%);transform:translate3d(-32px,0,0)}
+    46%{opacity:.24;clip-path:polygon(0 48%,100% 48%,100% 54%,0 54%);transform:translate3d(38px,0,0)}
+    47%{opacity:.30;clip-path:polygon(0 76%,100% 76%,100% 83%,0 83%);transform:translate3d(-22px,0,0)}
+    48%{opacity:0;clip-path:polygon(0 0,100% 0,100% 0,0 0)}
   }
 
   @keyframes bgGlitchFlash{
-    0%,97%,100%{opacity:0}
-    98%{opacity:.055;transform:perspective(760px) rotateX(63deg) translateY(19vh) translateX(18px) scale(1.42)}
+    0%,66%,100%{opacity:0;transform:translate3d(0,0,0)}
+    67%{opacity:.34;transform:translate3d(34px,0,0)}
+    68%{opacity:.12;transform:translate3d(-18px,0,0)}
+    69%{opacity:0;transform:translate3d(0,0,0)}
   }
 
-  /* keep content/UI above the background but below existing scanline/vignette overlays */
   #main{position:relative;z-index:2}
-  .lang-toggle{z-index:150}
-  #bot{z-index:300}
-  #boot{z-index:200}
-  #protect{z-index:10000}
 
+  @media(max-width:600px){
+    #glitch-grid{opacity:.36}
+    .gg-base,.gg-slice{
+      transform:perspective(520px) rotateX(60deg) translateY(25vh) scale(1.38);
+      background-size:74px 58px,100% 100%,100% 100%,74px 58px,74px 58px;
+    }
+  }
+
+  @media(prefers-reduced-motion:reduce){
+    .gg-base,.gg-noise,.gg-slice-a,.gg-slice-b,.gg-slice-c,.gg-hardline,.gg-flash{animation:none}
+    #glitch-grid{opacity:.32}
+  }
 
   /* BOOT */
   #boot{position:fixed;inset:0;background:var(--bg);z-index:200;display:flex;flex-direction:column;justify-content:center;padding:60px;transition:opacity .7s ease}
@@ -225,18 +314,6 @@
   body.ua .job[data-en]{display:none}body.ua .job[data-ua]{display:block}
   body.ua .li[data-en]{display:none}body.ua .li[data-ua]{display:flex}
 
-
-
-  @media(max-width:600px){
-    #glitch-grid{opacity:.20;inset:-6vh -10vw}
-    .gg-layer{transform:perspective(540px) rotateX(59deg) translateY(23vh) scale(1.28)}
-  }
-
-  @media(prefers-reduced-motion:reduce){
-    .gg-base,.gg-slice-a,.gg-slice-b,.gg-flash{animation:none}
-    #glitch-grid{opacity:.16}
-  }
-
   @media(max-width:600px){
     #boot{padding:32px 20px}
     #main{padding:36px 20px 60px}
@@ -249,10 +326,15 @@
 </style>
 </head>
 <body class="ua">
+
+<!-- Background: readable BIOS sci-fi grid + glitch slices -->
 <div id="glitch-grid" aria-hidden="true">
   <div class="gg-layer gg-base"></div>
-  <div class="gg-layer gg-slice-a"></div>
-  <div class="gg-layer gg-slice-b"></div>
+  <div class="gg-layer gg-noise"></div>
+  <div class="gg-layer gg-slice gg-slice-a"></div>
+  <div class="gg-layer gg-slice gg-slice-b"></div>
+  <div class="gg-layer gg-slice gg-slice-c"></div>
+  <div class="gg-layer gg-hardline"></div>
   <div class="gg-layer gg-flash"></div>
 </div>
 
@@ -502,6 +584,10 @@ setTimeout(()=>{
 // Lang
 function setLang(l){
   document.body.className=l;
+  document.documentElement.lang = l === 'ua' ? 'uk' : 'en';
+  document.title = l === 'ua'
+    ? 'Ігор Гведде - AI Systems Builder'
+    : 'Igor Gvedde - AI Systems Builder';
   document.getElementById('btnUA').classList.toggle('active',l==='ua');
   document.getElementById('btnEN').classList.toggle('active',l==='en');
   const ph=document.getElementById('bot-in');
