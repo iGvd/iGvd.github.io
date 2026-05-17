@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ігор Гведде - AI Systems Builder</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Space+Mono:wght@400;700&display=swap');
+  :root{--bg:#080808;--fg:#e8e8e8;--dim:#444;--mid:#777;--accent:#fff;--line:#1e1e1e;--scan:rgba(255,255,255,0.012)}
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{background:var(--bg)}
+  body{font-family:'Share Tech Mono',monospace;background:var(--bg);color:var(--fg);min-height:100vh;overflow-x:hidden}
+  body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,var(--scan) 2px,var(--scan) 4px);pointer-events:none;z-index:100}
+  body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,0.65) 100%);pointer-events:none;z-index:99}
+
+  /* BOOT */
+  #boot{position:fixed;inset:0;background:var(--bg);z-index:200;display:flex;flex-direction:column;justify-content:center;padding:60px;transition:opacity .7s ease}
+  #boot.hide{opacity:0;pointer-events:none}
+  .bl{font-size:12px;color:var(--mid);line-height:2.1;opacity:0;transform:translateY(3px);transition:opacity .25s ease,transform .25s ease}
+  .bl.show{opacity:1;transform:none}
+  .bl.hi{color:var(--fg)}
+  .bl.ac{color:var(--accent);font-family:'Space Mono',monospace;font-size:20px;margin-top:10px}
+  .bcursor{display:inline-block;width:10px;height:18px;background:var(--accent);margin-left:4px;vertical-align:middle;animation:cblink 1s step-end infinite}
+  @keyframes cblink{0%,100%{opacity:1}50%{opacity:0}}
+
+  /* LANG */
+  .lang-toggle{position:fixed;top:24px;right:32px;z-index:150;display:none}
+  .lang-toggle.visible{display:flex}
+  .lang-btn{background:none;border:1px solid var(--dim);color:var(--mid);font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;padding:5px 12px;cursor:pointer;transition:all .2s}
+  .lang-btn:first-child{border-right:none}
+  .lang-btn.active{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+  .lang-btn:hover:not(.active){border-color:var(--mid);color:var(--fg)}
+
+  /* MAIN */
+  #main{opacity:0;transition:opacity .9s ease;max-width:840px;margin:0 auto;padding:52px 40px 80px}
+  #main.show{opacity:1}
+
+  .header{border-bottom:1px solid var(--line);padding-bottom:28px;margin-bottom:36px}
+  .name{font-family:'Space Mono',monospace;font-size:30px;font-weight:700;color:var(--accent);letter-spacing:-.5px;opacity:0;animation:fadeup .5s ease .1s forwards}
+  .jtitle{font-size:11px;color:var(--mid);letter-spacing:3px;text-transform:uppercase;margin-top:6px;opacity:0;animation:fadeup .5s ease .25s forwards}
+  .meta{display:flex;flex-wrap:wrap;gap:18px;margin-top:14px;font-size:11px;color:var(--dim);opacity:0;animation:fadeup .5s ease .4s forwards}
+  .meta a{color:var(--mid);text-decoration:none;border-bottom:1px solid var(--dim);padding-bottom:1px;transition:color .15s,border-color .15s}
+  .meta a:hover{color:var(--accent);border-color:var(--accent)}
+
+  .section{margin-bottom:36px;opacity:0;transform:translateY(8px);transition:opacity .45s ease,transform .45s ease}
+  .section.visible{opacity:1;transform:none}
+  .slabel{font-size:8px;letter-spacing:4px;text-transform:uppercase;color:var(--dim);margin-bottom:14px;display:flex;align-items:center;gap:14px}
+  .slabel::after{content:'';flex:1;height:1px;background:var(--line)}
+
+  .summary p{font-size:12.5px;line-height:1.9;color:var(--fg);margin-bottom:6px}
+  .note{font-size:10.5px;color:var(--mid);margin-top:4px}
+
+  /* SHOWREEL */
+  .reel-btn{display:inline-flex;align-items:center;gap:12px;border:1px solid var(--dim);padding:12px 20px;text-decoration:none;color:var(--mid);font-size:11px;letter-spacing:2px;transition:all .2s;margin-top:4px}
+  .reel-btn:hover{border-color:var(--accent);color:var(--accent)}
+  .reel-arrow{font-size:14px}
+  .reel-note{font-size:9px;color:var(--dim);margin-top:8px;letter-spacing:1px}
+
+  .skills{display:grid;gap:9px}
+  .sr{display:grid;grid-template-columns:170px 1fr;gap:14px;font-size:11px;line-height:1.7;border-left:1px solid var(--line);padding-left:14px}
+  .sk-l{font-size:9.5px;color:var(--mid);padding-top:1px}
+  .sk-v{color:var(--fg)}
+  .sk-v a{color:var(--mid);text-decoration:none;border-bottom:1px solid var(--dim)}
+  .sk-v a:hover{color:var(--accent)}
+
+  .achs{display:grid}
+  .ach{display:flex;gap:18px;font-size:11.5px;line-height:1.65;padding:7px 0;border-bottom:1px solid var(--line)}
+  .ach:last-child{border:none}
+  .an{font-size:9px;color:var(--dim);min-width:18px;padding-top:3px}
+  .at{color:var(--fg)}
+
+  .job{margin-bottom:24px;padding-left:14px;border-left:1px solid var(--line)}
+  .jco{font-family:'Space Mono',monospace;font-size:11.5px;font-weight:700;color:var(--accent)}
+  .jro{font-size:10.5px;color:var(--mid);margin-top:2px}
+  .jpe{font-size:9.5px;color:var(--dim);margin-top:1px;margin-bottom:7px}
+  .jbu{list-style:none}
+  .jbu li{font-size:11px;color:var(--fg);line-height:1.7;padding-left:12px;position:relative;margin-bottom:1px}
+  .jbu li::before{content:'-';position:absolute;left:0;color:var(--dim)}
+
+  .langs{display:flex;gap:28px;flex-wrap:wrap}
+  .li{display:flex;flex-direction:column;gap:2px}
+  .ln{font-size:12px;color:var(--fg)}
+  .ll{font-size:9.5px;color:var(--dim)}
+
+  .contacts{display:flex;flex-wrap:wrap;gap:20px}
+  .ci{display:flex;flex-direction:column;gap:3px}
+  .cl{font-size:8.5px;letter-spacing:2px;text-transform:uppercase;color:var(--dim)}
+  .ci a{font-size:11.5px;color:var(--mid);text-decoration:none;border-bottom:1px solid var(--dim);padding-bottom:1px;transition:color .15s,border-color .15s}
+  .ci a:hover{color:var(--accent);border-color:var(--accent)}
+
+  /* BOT */
+  #bot{position:fixed;bottom:24px;right:32px;z-index:300;display:none;flex-direction:column;align-items:flex-end;gap:12px}
+  #bot.visible{display:flex}
+
+  #bot-toggle{background:var(--bg);border:1px solid var(--mid);color:var(--fg);font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;padding:10px 16px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:8px}
+  #bot-toggle:hover{border-color:var(--accent);color:var(--accent)}
+  .bot-dot{width:6px;height:6px;border-radius:50%;background:#4ade80;animation:pulse 2s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+
+  #bot-window{display:none;width:340px;border:1px solid var(--line);background:rgba(8,8,8,0.97);flex-direction:column;overflow:hidden}
+  #bot-window.open{display:flex}
+
+  .bot-header{padding:12px 16px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+  .bot-title{font-size:10px;letter-spacing:2px;color:var(--mid)}
+  .bot-close{background:none;border:none;color:var(--dim);font-size:16px;cursor:pointer;line-height:1;transition:color .15s}
+  .bot-close:hover{color:var(--accent)}
+
+  .bot-messages{height:280px;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;scroll-behavior:smooth}
+  .bot-messages::-webkit-scrollbar{width:2px}
+  .bot-messages::-webkit-scrollbar-track{background:transparent}
+  .bot-messages::-webkit-scrollbar-thumb{background:var(--dim)}
+
+  .msg{font-size:11px;line-height:1.7;max-width:85%}
+  .msg.bot{color:var(--fg);align-self:flex-start}
+  .msg.bot::before{content:'> ';color:var(--dim)}
+  .msg.user{color:var(--mid);align-self:flex-end;text-align:right}
+  .msg.typing{color:var(--dim)}
+  .msg.typing::after{content:'...';animation:dots 1.2s infinite}
+  @keyframes dots{0%{content:'.'}33%{content:'..'}66%{content:'...'}100%{content:'.'}}
+
+  .bot-input-row{border-top:1px solid var(--line);display:flex}
+  .bot-input{flex:1;background:none;border:none;padding:12px 16px;font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--fg);outline:none}
+  .bot-input::placeholder{color:var(--dim)}
+  .bot-send{background:none;border:none;border-left:1px solid var(--line);padding:0 16px;color:var(--mid);font-family:'Share Tech Mono',monospace;font-size:10px;cursor:pointer;transition:color .15s;letter-spacing:1px}
+  .bot-send:hover{color:var(--accent)}
+
+  /* PROTECT */
+  #protect{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.97);z-index:10000;flex-direction:column;align-items:center;justify-content:center;gap:20px}
+  #protect.show{display:flex}
+  .p-title{font-family:'Space Mono',monospace;font-size:28px;color:var(--accent);letter-spacing:2px}
+  .p-sub{font-size:13px;color:var(--mid);letter-spacing:1px}
+  .p-data{font-size:10px;color:var(--dim);margin-top:8px;text-align:center;line-height:2;white-space:pre}
+  .p-close{margin-top:24px;background:none;border:1px solid var(--dim);color:var(--mid);font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;padding:8px 20px;cursor:pointer;transition:all .2s}
+  .p-close:hover{border-color:var(--accent);color:var(--accent)}
+
+  .footer{margin-top:48px;padding-top:16px;border-top:1px solid var(--line);display:flex;justify-content:space-between;font-size:9px;color:var(--dim);flex-wrap:wrap;gap:6px;opacity:0;animation:fadeup .5s ease 1.2s forwards}
+
+  @keyframes fadeup{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+
+  /* Lang */
+  [data-ua]{display:none}[data-en]{display:block}
+  .sr[data-ua],.sr[data-en]{display:grid}
+  .ach[data-ua],.ach[data-en]{display:flex}
+  .job[data-ua],.job[data-en]{display:block}
+  .li[data-ua],.li[data-en]{display:flex}
+  body.ua [data-en]{display:none}body.ua [data-ua]{display:block}
+  body.ua .sr[data-en]{display:none}body.ua .sr[data-ua]{display:grid}
+  body.ua .ach[data-en]{display:none}body.ua .ach[data-ua]{display:flex}
+  body.ua .job[data-en]{display:none}body.ua .job[data-ua]{display:block}
+  body.ua .li[data-en]{display:none}body.ua .li[data-ua]{display:flex}
+
+  @media(max-width:600px){
+    #boot{padding:32px 20px}
+    #main{padding:36px 20px 60px}
+    .name{font-size:22px}
+    .sr{grid-template-columns:1fr;gap:3px}
+    .lang-toggle{top:14px;right:14px}
+    #bot{bottom:16px;right:16px}
+    #bot-window{width:calc(100vw - 32px)}
+  }
+</style>
+</head>
+<body class="ua">
+
+<div id="boot">
+  <div class="bl" id="b0">SYSTEM INIT...</div>
+  <div class="bl" id="b1">CPU: CREATIVE + TECHNICAL &nbsp;[OK]</div>
+  <div class="bl" id="b2">MEMORY: 15 YRS BROADCAST / DIGITAL &nbsp;[OK]</div>
+  <div class="bl" id="b3">AI SUBSYSTEMS: LOADED &nbsp;[OK]</div>
+  <div class="bl" id="b4">PIPELINES: ACTIVE &nbsp;~1000 FILES/WEEK &nbsp;[OK]</div>
+  <div class="bl" id="b5">&nbsp;</div>
+  <div class="bl ac" id="b6">IGOR GVEDDE <span class="bcursor"></span></div>
+</div>
+
+<div id="protect">
+  <div class="p-title">ПЕК ТЕБЕ</div>
+  <div class="p-sub" data-ua>Ваші дані надіслані. Гарного дня.</div>
+  <div class="p-sub" data-en>Your data has been sent. Have a nice day.</div>
+  <div class="p-data" id="pdata"></div>
+  <button class="p-close" onclick="closeProtect()">[ ЗАКРИТИ ]</button>
+</div>
+
+<div class="lang-toggle" id="lt">
+  <button class="lang-btn active" id="btnUA" onclick="setLang('ua')">UA</button>
+  <button class="lang-btn" id="btnEN" onclick="setLang('en')">EN</button>
+</div>
+
+<!-- Bot -->
+<div id="bot">
+  <div id="bot-window">
+    <div class="bot-header">
+      <span class="bot-title" data-ua>ЗАПИТАЙ ПОРТФОЛІО</span>
+      <span class="bot-title" data-en>ASK MY PORTFOLIO</span>
+      <button class="bot-close" onclick="toggleBot()">×</button>
+    </div>
+    <div class="bot-messages" id="bot-msgs">
+      <div class="msg bot" data-ua>Привіт. Я знаю все про Ігоря. Що хочеш дізнатись?</div>
+      <div class="msg bot" data-en>Hi. I know everything about Igor. What would you like to know?</div>
+    </div>
+    <div class="bot-input-row">
+      <input class="bot-input" id="bot-in" placeholder="Напиши питання..." onkeydown="if(event.key==='Enter')sendMsg()">
+      <button class="bot-send" onclick="sendMsg()">SEND</button>
+    </div>
+  </div>
+  <button id="bot-toggle" onclick="toggleBot()">
+    <span class="bot-dot"></span>
+    <span data-ua>ЗАПИТАЙ ПОРТФОЛІО</span>
+    <span data-en>ASK MY PORTFOLIO</span>
+  </button>
+</div>
+
+<div id="main">
+  <div class="header">
+    <div class="name" data-ua>Ігор Гведде</div>
+    <div class="name" data-en>Igor Gvedde</div>
+    <div class="jtitle" data-ua>Будівник ШІ-систем</div>
+    <div class="jtitle" data-en>AI Systems Builder</div>
+    <div class="meta">
+      <a href="https://www.linkedin.com/in/gvedde/" target="_blank">linkedin</a>
+      <a href="https://www.instagram.com/gvedded" target="_blank">instagram</a>
+      <a href="https://open.spotify.com/artist/6iQIzKZ14u2KEYGeHhSM4S" target="_blank">spotify</a>
+      <a href="https://djinni.co/q/6cd1a60f2c/" target="_blank">djinni</a>
+      <span data-ua>Київ / Віддалено</span>
+      <span data-en>Kyiv / Remote</span>
+    </div>
+  </div>
+
+  <div class="section" data-s>
+    <div class="slabel" data-ua>Про себе</div>
+    <div class="slabel" data-en>Profile</div>
+    <div class="summary">
+      <p data-ua>Один закриваю повний цикл: ШІ-автоматизації, боти, моушн, відео, звук, графіка - від ідеї до фінального файлу.</p>
+      <p data-en>One person, full cycle: AI automation, bots, motion, video, sound, graphics - from idea to final file.</p>
+      <p data-ua>15 років у копірайтингу, маркетингу, broadcast TV, арт-дирекції. Розумію бізнес, креатив і технології однаково добре.</p>
+      <p data-en>15 years across copywriting, marketing, broadcast TV, art direction. I understand business, creative and technology equally well.</p>
+      <p class="note" data-ua>Поточний масштаб: ~1000 відео на тиждень &nbsp;/&nbsp; Портфоліо за запитом &nbsp;/&nbsp; Поточні проєкти під NDA</p>
+      <p class="note" data-en>Current scale: ~1,000 videos per week &nbsp;/&nbsp; Portfolio on request &nbsp;/&nbsp; Current work NDA-protected</p>
+    </div>
+  </div>
+
+  <div class="section" data-s>
+    <div class="slabel" data-ua>Шоуріл</div>
+    <div class="slabel" data-en>Showreel</div>
+    <a class="reel-btn" href="https://www.youtube.com/watch?v=62d_IfrnZhg" target="_blank">
+      <span class="reel-arrow">▶</span>
+      <span data-ua>ПЕРЕГЛЯНУТИ MOTION SHOWREEL</span>
+      <span data-en>WATCH MOTION SHOWREEL</span>
+    </a>
+    <div class="reel-note" data-ua>ДОВОЄННИЙ / ПОТОЧНІ РОБОТИ ПІД NDA / ГЕНЕРАТИВНЕ ПОРТФОЛІО ЗА ЗАПИТОМ</div>
+    <div class="reel-note" data-en>PRE-WAR / CURRENT WORK NDA-PROTECTED / GENERATIVE PORTFOLIO ON REQUEST</div>
+  </div>
+
+  <div class="section" data-s>
+    <div class="slabel" data-ua>Навички</div>
+    <div class="slabel" data-en>Skills</div>
+    <div class="skills">
+      <div class="sr" data-ua><div class="sk-l">ШІ-системи</div><div class="sk-v">Архітектура пайплайнів, кастомні боти, LLM-платформи (GPT, Gemini, Claude+), автоматизація процесів, генеративні системи: зображення / відео / аудіо / голос</div></div>
+      <div class="sr" data-en><div class="sk-l">AI Systems</div><div class="sk-v">Pipeline architecture, custom bot development, LLM platforms (GPT, Gemini, Claude+), workflow automation, generative systems: image / video / audio / voice</div></div>
+      <div class="sr" data-ua><div class="sk-l">Детекція та захист</div><div class="sk-v">Виявлення ШІ-контенту (текст, аудіо, відео, фото), аудіо-системи протидії ШІ, бета R&amp;D (NDA)</div></div>
+      <div class="sr" data-en><div class="sk-l">Detection + Protection</div><div class="sk-v">AI-generated content detection (text, audio, video, photo), audio-based AI interference systems, beta R&amp;D (NDA)</div></div>
+      <div class="sr" data-ua><div class="sk-l">Моушн та постпродакшн</div><div class="sk-v">Adobe CC - After Effects, Premiere, Photoshop, Illustrator, Audition + ШІ-плагіни, Cinema 4D + Octane (VFX, моушн-графіка, симуляції, трекінг)</div></div>
+      <div class="sr" data-en><div class="sk-l">Motion + Post</div><div class="sk-v">Adobe CC - After Effects, Premiere, Photoshop, Illustrator, Audition + AI plugins, Cinema 4D + Octane (VFX, mograph, simulation, tracking)</div></div>
+      <div class="sr" data-ua><div class="sk-l">Генеративний ШІ</div><div class="sk-v">Midjourney Топ-спеціаліст, генерація зображень / відео / звуку, соник-брендинг, ШІ-музика (<a href="https://open.spotify.com/artist/6iQIzKZ14u2KEYGeHhSM4S" target="_blank">лейбл gvd на Spotify</a>)</div></div>
+      <div class="sr" data-en><div class="sk-l">Generative AI</div><div class="sk-v">Midjourney Top Specialist, image / video / sound generation, sonic branding, AI music (<a href="https://open.spotify.com/artist/6iQIzKZ14u2KEYGeHhSM4S" target="_blank">gvd on Spotify</a>)</div></div>
+    </div>
+  </div>
+
+  <div class="section" data-s>
+    <div class="slabel" data-ua>Досягнення</div>
+    <div class="slabel" data-en>Key Achievements</div>
+    <div class="achs">
+      <div class="ach" data-ua><div class="an">01</div><div class="at">Офіційний Топ-спеціаліст Midjourney, автор комерційного про-гайду</div></div>
+      <div class="ach" data-en><div class="an">01</div><div class="at">Midjourney official Top Specialist, authored commercial pro-guide</div></div>
+      <div class="ach" data-ua><div class="an">02</div><div class="at">ШІ-контент: 1М+ органічних лайків на X за 48 годин</div></div>
+      <div class="ach" data-en><div class="an">02</div><div class="at">AI content: 1M+ organic likes on X within 48 hours</div></div>
+      <div class="ach" data-ua><div class="an">03</div><div class="at">Премії з моушн-дизайну: 1 національна + 2 кліпмейкерські</div></div>
+      <div class="ach" data-en><div class="an">03</div><div class="at">Motion design awards: 1 national + 2 clipmaking</div></div>
+      <div class="ach" data-ua><div class="an">04</div><div class="at">Ребрендинг Inter Media Group: частка каналу зросла з 1.8 до 2.8</div></div>
+      <div class="ach" data-en><div class="an">04</div><div class="at">Visual rebrand at Inter Media Group: channel share 1.8 to 2.8</div></div>
+      <div class="ach" data-ua><div class="an">05</div><div class="at">Засновник gvd - ШІ-музичний лейбл, активний на Spotify з монетизацією</div></div>
+      <div class="ach" data-en><div class="an">05</div><div class="at">Founder, gvd - AI music label, live on Spotify, monetized</div></div>
+      <div class="ach" data-ua><div class="an">06</div><div class="at">Масштабував виробництво до ~1000 відео/тиждень через ШІ-пайплайни</div></div>
+      <div class="ach" data-en><div class="an">06</div><div class="at">Scaled to ~1,000 videos/week via custom AI pipelines</div></div>
+      <div class="ach" data-ua><div class="an">07</div><div class="at">Розробив бета-систему детекції ШІ-контенту: текст, аудіо, відео, фото</div></div>
+      <div class="ach" data-en><div class="an">07</div><div class="at">Built beta AI detection system: text, audio, video, photo (local, UA)</div></div>
+    </div>
+  </div>
+
+  <div class="section" data-s>
+    <div class="slabel" data-ua>Досвід</div>
+    <div class="slabel" data-en>Experience</div>
+    <div class="job" data-ua><div class="jco">Division Digital Production</div><div class="jro">Будівник ШІ-систем / Motion Lead</div><div class="jpe">2022 - дотепер</div><ul class="jbu"><li>Покриваю ~75% усіх проєктів - фактично замінюю команду з 9 моушн-дизайнерів</li><li>Масштабую виробництво до ~1000 відео/тиждень через ШІ-пайплайни та автоматизацію</li><li>Розробляю шаблони, кастомні боти, генеративні процеси: зображення / відео / аудіо</li><li>R&amp;D: бета-системи детекції ШІ-контенту та аудіо-захисту</li></ul></div>
+    <div class="job" data-en><div class="jco">Division Digital Production</div><div class="jro">AI Systems Builder / Motion Lead</div><div class="jpe">2022 - Present</div><ul class="jbu"><li>Cover ~75% of all projects - functionally replacing a 9-person motion team</li><li>Scale output to ~1,000 videos/week via custom AI pipelines and automation</li><li>Build reusable templates, custom bots, generative workflows: image / video / audio</li><li>R&amp;D: built beta AI detection and audio-based AI protection tools</li></ul></div>
+    <div class="job" data-ua><div class="jco">Shopping Mall Gulliver</div><div class="jro">Арт-директор, OOH / LED-екосистема</div><div class="jpe">~2021 - 2022</div><ul class="jbu"><li>Повна концептуальна візуальна ідентичність великого торгового центру</li><li>Суттєве зростання помітності у соцмережах та відвідуваності після ребрендингу</li></ul></div>
+    <div class="job" data-en><div class="jco">Shopping Mall Gulliver</div><div class="jro">Art Director, OOH / LED Ecosystem</div><div class="jpe">~2021 - 2022</div><ul class="jbu"><li>Created full conceptual visual identity for a major retail destination</li><li>Significant growth in social media visibility and corporate footfall after rebrand</li></ul></div>
+    <div class="job" data-ua><div class="jco">A7 Television Production (M1 / M2 TV)</div><div class="jro">Арт-директор, Broadcast та Кліпи</div><div class="jpe">~2016 - 2022</div><ul class="jbu"><li>Візуальна ідентичність великих українських телеканалів протягом 5+ років</li><li>Моушн-пакети досі в ефірі, кліпи набрали мільйони переглядів</li></ul></div>
+    <div class="job" data-en><div class="jco">A7 Television Production (M1 / M2 TV)</div><div class="jro">Art Director, Broadcast and Clips</div><div class="jpe">~2016 - 2022</div><ul class="jbu"><li>Led broadcast visual identity across major Ukrainian TV channels for 5+ years</li><li>Motion packages still on air, music videos reached millions of views</li></ul></div>
+    <div class="job" data-ua><div class="jco">Inter Media Group</div><div class="jro">Senior Motion Designer, Broadcast</div><div class="jpe">~2014 - 2016</div><ul class="jbu"><li>Керував візуальним виробництвом каналів K1, K2 та інших</li><li>Нарощував частку продакшн-виробництва в портфелі холдингу</li></ul></div>
+    <div class="job" data-en><div class="jco">Inter Media Group</div><div class="jro">Senior Motion Designer, Broadcast</div><div class="jpe">~2014 - 2016</div><ul class="jbu"><li>Managed visual output across K1, K2 and other entertainment channels</li><li>Grew personal share of production output across the holding's portfolio</li></ul></div>
+    <div class="job" data-ua><div class="jco">Business Radio Group</div><div class="jro">Керівник маркетингу та Креативний директор</div><div class="jpe">~2012 - 2014</div><ul class="jbu"><li>Побудував і очолив повний відділ маркетингу: стратеги, маркетологи, копірайтери</li><li>Брендовані формати контенту що генерували дохід понад прямі розміщення</li><li>Також виступав як голосовий талант для радіороликів</li></ul></div>
+    <div class="job" data-en><div class="jco">Business Radio Group</div><div class="jro">Head of Marketing and Creative Direction</div><div class="jpe">~2012 - 2014</div><ul class="jbu"><li>Built and led full marketing department: strategists, marketers, copywriters</li><li>Developed branded content formats driving advertiser revenue beyond direct placements</li><li>Also served as voice talent for radio commercials</li></ul></div>
+    <div class="job" data-ua><div class="jco">Secret Service Entertainment Agency</div><div class="jro">Виконавчий директор / Керівник маркетингу</div><div class="jpe">~2010 - 2012</div><ul class="jbu"><li>Глобальні кампейн-стратегії та операційні маркетингові системи</li><li>Спортивний маркетинговий проєкт братів Кличко - один з найгучніших в Україні</li></ul></div>
+    <div class="job" data-en><div class="jco">Secret Service Entertainment Agency</div><div class="jro">Executive Director / Marketing Lead</div><div class="jpe">~2010 - 2012</div><ul class="jbu"><li>Developed global campaign strategies and full operational marketing systems</li><li>Led Klitschko Brothers sports marketing - one of Ukraine's highest-profile campaigns</li></ul></div>
+    <div class="job" data-ua><div class="jco">Think! McCann Erickson</div><div class="jro">Рекламний копірайтер</div><div class="jpe">~2008 - 2010</div><ul class="jbu"><li>Сценарії та творчі концепції для TV-роликів різних брендів</li><li>Наративні структури для форматів 30-60 секунд - від брифу до фіналу</li></ul></div>
+    <div class="job" data-en><div class="jco">Think! McCann Erickson</div><div class="jro">Advertising Copywriter</div><div class="jpe">~2008 - 2010</div><ul class="jbu"><li>Scripts and creative concepts for TV commercials across multiple brands</li><li>Narrative structures for 30-60 second formats - from brief to final script</li></ul></div>
+    <div class="job" data-ua><div class="jco">Technodetki.com</div><div class="jro">Співзасновник</div><div class="jpe">2003 - ~2008</div><ul class="jbu"><li>Одна з перших нішевих соцмереж України - ком'юніті для електронної музики</li><li>Сотні живих подій по Києву - від клубних вечірок до опен-ейрів</li><li>Бронювання міжнародних артистів, привіз сотні європейських діджеїв в Україну</li></ul></div>
+    <div class="job" data-en><div class="jco">Technodetki.com</div><div class="jro">Co-Founder</div><div class="jpe">2003 - ~2008</div><ul class="jbu"><li>Co-founded one of Ukraine's first niche social networks for the electronic music community</li><li>Organized hundreds of live events across Kyiv - club nights to open-air festivals</li><li>Managed international artist bookings, bringing European DJs to Ukraine</li></ul></div>
+  </div>
+
+  <div class="section" data-s>
+    <div class="slabel" data-ua>Мови</div>
+    <div class="slabel" data-en>Languages</div>
+    <div class="langs">
+      <div class="li" data-ua><div class="ln">Українська</div><div class="ll">Рідна</div></div>
+      <div class="li" data-en><div class="ln">Ukrainian</div><div class="ll">Native</div></div>
+      <div class="li" data-ua><div class="ln">Англійська</div><div class="ll">B1, вдосконалюю</div></div>
+      <div class="li" data-en><div class="ln">English</div><div class="ll">B1, improving</div></div>
+      <div class="li" data-ua><div class="ln">Іспанська</div><div class="ll">A1</div></div>
+      <div class="li" data-en><div class="ln">Spanish</div><div class="ll">A1</div></div>
+    </div>
+  </div>
+
+  <div class="section" data-s>
+    <div class="slabel" data-ua>Зв'язок</div>
+    <div class="slabel" data-en>Contact</div>
+    <div class="contacts">
+      <div class="ci"><div class="cl">LinkedIn</div><a href="https://www.linkedin.com/in/gvedde/" target="_blank">linkedin.com/in/gvedde</a></div>
+      <div class="ci"><div class="cl">Instagram</div><a href="https://www.instagram.com/gvedded" target="_blank">@gvedded</a></div>
+      <div class="ci"><div class="cl">Spotify</div><a href="https://open.spotify.com/artist/6iQIzKZ14u2KEYGeHhSM4S" target="_blank">gvd</a></div>
+      <div class="ci"><div class="cl">Djinni</div><a href="https://djinni.co/q/6cd1a60f2c/" target="_blank">djinni.co</a></div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span data-ua>ІГОР ГВЕДДЕ / БУДІВНИК ШІ-СИСТЕМ / КИЇВ UA</span>
+    <span data-en>IGOR GVEDDE / AI SYSTEMS BUILDER / KYIV UA</span>
+    <span id="ts"></span>
+  </div>
+</div>
+
+<script>
+
+
+const CV_CONTEXT = `Ти асистент на сайті-портфоліо Ігоря Гведде. Відповідай коротко і по суті, в стилі терміналу - без зайвих слів. Якщо питання українською - відповідай українською. Якщо англійською - англійською.
+
+ПРО ІГОРЯ:
+- Повне ім'я: Ігор Гведде / Igor Gvedde
+- Посада: AI Systems Builder (Будівник ШІ-систем)
+- Локація: Київ, Україна. Відкритий до remote/проєктної роботи
+- Зарплатні очікування: $5000-6000/міс
+
+НАВИЧКИ:
+- ШІ-системи: архітектура пайплайнів, кастомні боти, LLM (GPT, Gemini, Claude+), автоматизація, генеративні системи (зображення/відео/аудіо/голос), клонування голосу
+- Детекція та захист: виявлення ШІ-контенту (текст, аудіо, відео, фото), аудіо-системи протидії ШІ (бета, NDA)
+- Motion/Post: Adobe CC (AE, Premiere, PS, AI, Audition) + ШІ-плагіни, Cinema 4D + Octane
+- Генеративний ШІ: Midjourney Top Specialist, image/video/sound generation, sonic branding
+- Також: веб-розробка (Python, HTML/JS), копірайтинг, маркетинг, арт-дирекція
+
+ДОСВІД:
+- Division Digital Production (2022-зараз): AI Systems Builder / Motion Lead. Покриває ~75% проєктів, замінює команду з 9. ~1000 відео/тиждень через AI pipelines.
+- Shopping Mall Gulliver (~2021-2022): Арт-директор, OOH/LED
+- A7 TV Production / M1 / M2 (~2016-2022): Арт-директор, broadcast
+- Inter Media Group (~2014-2016): Senior Motion Designer
+- Business Radio Group (~2012-2014): Head of Marketing
+- Secret Service Agency (~2010-2012): Executive Director. Проєкт братів Кличко.
+- Think! McCann Erickson (~2008-2010): Copywriter
+- Technodetki.com (2003-2008): Co-Founder, одна з перших соцмереж України для електронної музики
+
+ДОСЯГНЕННЯ:
+- Midjourney офіційний Top Specialist, автор комерційного про-гайду
+- 1M+ органічних лайків на X за 48 годин
+- 1 національна + 2 кліпмейкерські премії з motion design
+- Ребрендинг Inter Media Group: частка каналу 1.8 -> 2.8
+- Засновник gvd - AI music label на Spotify (монетизований)
+- ~1000 відео/тиждень через custom AI pipelines
+- Бета-система детекції ШІ-контенту (текст/аудіо/відео/фото, локально, UA)
+
+КОНТАКТИ:
+- LinkedIn: linkedin.com/in/gvedde
+- Instagram: @gvedded
+- Spotify: gvd
+- Djinni: djinni.co/q/6cd1a60f2c/
+- Портфоліо: за запитом (поточна робота під NDA)
+- Showreel (довоєнний): youtube.com/watch?v=62d_IfrnZhg
+
+МОВИ: Українська (рідна), Англійська B1, Іспанська A1`;
+
+// Boot
+[['b0',0],['b1',280],['b2',560],['b3',840],['b4',1100],['b5',1380],['b6',1650]].forEach(([id,d])=>{
+  setTimeout(()=>{
+    const e=document.getElementById(id);
+    if(e){e.classList.add('show');if(id!=='b6')e.classList.add('hi')}
+  },d);
+});
+setTimeout(()=>{
+  document.getElementById('boot').classList.add('hide');
+  setTimeout(()=>{
+    document.getElementById('boot').style.display='none';
+    document.getElementById('main').classList.add('show');
+    document.getElementById('lt').classList.add('visible');
+    document.getElementById('bot').classList.add('visible');
+    const obs=new IntersectionObserver(en=>{en.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target)}})},{threshold:0.06});
+    document.querySelectorAll('[data-s]').forEach((s,i)=>{s.style.transitionDelay=i*.07+'s';obs.observe(s)});
+  },750);
+},2600);
+
+// Lang
+function setLang(l){
+  document.body.className=l;
+  document.getElementById('btnUA').classList.toggle('active',l==='ua');
+  document.getElementById('btnEN').classList.toggle('active',l==='en');
+  const ph=document.getElementById('bot-in');
+  if(ph)ph.placeholder=l==='ua'?'Напиши питання...':'Ask a question...';
+}
+
+// Bot
+function toggleBot(){
+  const w=document.getElementById('bot-window');
+  w.classList.toggle('open');
+}
+
+const history=[];
+
+async function sendMsg(){
+  const inp=document.getElementById('bot-in');
+  const txt=inp.value.trim();
+  if(!txt)return;
+  inp.value='';
+
+  const msgs=document.getElementById('bot-msgs');
+
+  const uDiv=document.createElement('div');
+  uDiv.className='msg user';
+  uDiv.textContent=txt;
+  msgs.appendChild(uDiv);
+
+  const tDiv=document.createElement('div');
+  tDiv.className='msg typing bot';
+  tDiv.textContent=' ';
+  msgs.appendChild(tDiv);
+  msgs.scrollTop=msgs.scrollHeight;
+
+  history.push({role:'user',parts:[{text:txt}]});
+
+  try{
+    const res=await fetch(`https://gvedde-bot.gveddesign.workers.dev/`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        system_instruction:{parts:[{text:CV_CONTEXT}]},
+        contents:history
+      })
+    });
+    const data=await res.json();
+    const reply=data.candidates?.[0]?.content?.parts?.[0]?.text||(data.error?.message?'API ERR: '+data.error.message:JSON.stringify(data).slice(0,200));
+    history.push({role:'model',parts:[{text:reply}]});
+    tDiv.className='msg bot';
+    tDiv.textContent=reply;
+  }catch(e){
+    tDiv.className='msg bot';
+    tDiv.textContent='ERR: '+e.message;
+  }
+  msgs.scrollTop=msgs.scrollHeight;
+}
+
+// Protect
+function showProtect(){
+  const d=new Date();
+  document.getElementById('pdata').textContent=`IP: ${Math.floor(Math.random()*255)}.${Math.floor(Math.random()*255)}.${Math.floor(Math.random()*255)}.${Math.floor(Math.random()*255)}\nTIME: ${d.toISOString()}\nSTATUS: REPORTED`;
+  document.getElementById('protect').classList.add('show');
+}
+function closeProtect(){document.getElementById('protect').classList.remove('show')}
+document.addEventListener('contextmenu',e=>{e.preventDefault();showProtect()});
+document.addEventListener('keydown',e=>{
+  if(e.key==='F12'||(e.ctrlKey&&e.shiftKey&&['I','J','C','U'].includes(e.key))||(e.ctrlKey&&e.key==='U')){
+    e.preventDefault();showProtect();
+  }
+});
+
+// Date
+const d=new Date();
+document.getElementById('ts').textContent=d.getFullYear()+'.'+String(d.getMonth()+1).padStart(2,'0')+'.'+String(d.getDate()).padStart(2,'0');
+</script>
+</body>
+</html>
