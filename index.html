@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ігор Гведде - AI Systems Builder</title>
-<link rel="icon" type="image/png" href="icon.png">
-<link rel="shortcut icon" type="image/png" href="icon.png">
-<link rel="apple-touch-icon" href="icon.png">
+<link rel="icon" type="image/png" href="/icon.png?v=4">
+<link rel="shortcut icon" type="image/png" href="/icon.png?v=4">
+<link rel="apple-touch-icon" href="/icon.png?v=4">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Space+Mono:wght@400;700&display=swap');
   :root{--bg:#080808;--fg:#e8e8e8;--dim:#444;--mid:#777;--accent:#fff;--line:#1e1e1e;--scan:rgba(255,255,255,0.012)}
@@ -15,6 +15,79 @@
   body{font-family:'Share Tech Mono',monospace;background:var(--bg);color:var(--fg);min-height:100vh;overflow-x:hidden}
   body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,var(--scan) 2px,var(--scan) 4px);pointer-events:none;z-index:100}
   body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,0.65) 100%);pointer-events:none;z-index:99}
+
+  /* BACKGROUND: BIOS DEPTH GRID + SUBTLE GLITCH
+     Safe layer: no images, no JS, no clicks blocked. Text stays above. */
+  #glitch-grid{
+    position:fixed;
+    inset:-8vh -8vw;
+    z-index:0;
+    pointer-events:none;
+    overflow:hidden;
+    opacity:.30;
+    filter:contrast(1.08) brightness(.9);
+  }
+
+  .gg-layer{
+    position:absolute;
+    inset:0;
+    background:
+      radial-gradient(ellipse at 50% 58%, transparent 0 38%, rgba(255,255,255,.038) 39%, transparent 41%, transparent 54%, rgba(255,255,255,.024) 55%, transparent 57%),
+      repeating-linear-gradient(90deg, rgba(255,255,255,.044) 0 1px, transparent 1px 118px),
+      repeating-linear-gradient(0deg, rgba(255,255,255,.034) 0 1px, transparent 1px 82px),
+      linear-gradient(116deg, transparent 0 47%, rgba(255,255,255,.052) 48%, transparent 49% 100%),
+      linear-gradient(64deg, transparent 0 50%, rgba(255,255,255,.033) 51%, transparent 52% 100%);
+    transform:perspective(760px) rotateX(63deg) translateY(19vh) scale(1.42);
+    transform-origin:center bottom;
+    will-change:transform,opacity,clip-path;
+  }
+
+  .gg-base{
+    opacity:.62;
+    animation:gridDrift 22s linear infinite;
+  }
+
+  .gg-slice-a,
+  .gg-slice-b,
+  .gg-flash{
+    opacity:0;
+  }
+
+  .gg-slice-a{animation:bgGlitchA 7.4s steps(1,end) infinite}
+  .gg-slice-b{animation:bgGlitchB 10.8s steps(1,end) infinite}
+  .gg-flash{animation:bgGlitchFlash 13.5s steps(1,end) infinite}
+
+  @keyframes gridDrift{
+    0%{transform:perspective(760px) rotateX(63deg) translateY(19vh) translateX(0) scale(1.42)}
+    50%{transform:perspective(760px) rotateX(63deg) translateY(17vh) translateX(-1.2vw) scale(1.44)}
+    100%{transform:perspective(760px) rotateX(63deg) translateY(19vh) translateX(0) scale(1.42)}
+  }
+
+  @keyframes bgGlitchA{
+    0%,88%,100%{opacity:0;clip-path:polygon(0 0,100% 0,100% 0,0 0);transform:perspective(760px) rotateX(63deg) translateY(19vh) scale(1.42)}
+    89%{opacity:.20;clip-path:polygon(0 18%,100% 18%,100% 22%,0 22%);transform:perspective(760px) rotateX(63deg) translateY(19vh) translateX(12px) scale(1.42)}
+    90%{opacity:.13;clip-path:polygon(0 47%,100% 47%,100% 51%,0 51%);transform:perspective(760px) rotateX(63deg) translateY(19vh) translateX(-10px) scale(1.42)}
+    91%{opacity:.17;clip-path:polygon(0 69%,100% 69%,100% 72%,0 72%);transform:perspective(760px) rotateX(63deg) translateY(19vh) translateX(7px) scale(1.42)}
+  }
+
+  @keyframes bgGlitchB{
+    0%,94%,100%{opacity:0;clip-path:polygon(0 0,100% 0,100% 0,0 0);transform:perspective(760px) rotateX(63deg) translateY(19vh) scale(1.42)}
+    95%{opacity:.14;clip-path:polygon(0 29%,100% 29%,100% 31%,0 31%);transform:perspective(760px) rotateX(63deg) translateY(19vh) translateX(-16px) scale(1.42)}
+    96%{opacity:.19;clip-path:polygon(0 59%,100% 59%,100% 65%,0 65%);transform:perspective(760px) rotateX(63deg) translateY(19vh) translateX(9px) scale(1.42)}
+  }
+
+  @keyframes bgGlitchFlash{
+    0%,97%,100%{opacity:0}
+    98%{opacity:.055;transform:perspective(760px) rotateX(63deg) translateY(19vh) translateX(18px) scale(1.42)}
+  }
+
+  /* keep content/UI above the background but below existing scanline/vignette overlays */
+  #main{position:relative;z-index:2}
+  .lang-toggle{z-index:150}
+  #bot{z-index:300}
+  #boot{z-index:200}
+  #protect{z-index:10000}
+
 
   /* BOOT */
   #boot{position:fixed;inset:0;background:var(--bg);z-index:200;display:flex;flex-direction:column;justify-content:center;padding:60px;transition:opacity .7s ease}
@@ -152,6 +225,18 @@
   body.ua .job[data-en]{display:none}body.ua .job[data-ua]{display:block}
   body.ua .li[data-en]{display:none}body.ua .li[data-ua]{display:flex}
 
+
+
+  @media(max-width:600px){
+    #glitch-grid{opacity:.20;inset:-6vh -10vw}
+    .gg-layer{transform:perspective(540px) rotateX(59deg) translateY(23vh) scale(1.28)}
+  }
+
+  @media(prefers-reduced-motion:reduce){
+    .gg-base,.gg-slice-a,.gg-slice-b,.gg-flash{animation:none}
+    #glitch-grid{opacity:.16}
+  }
+
   @media(max-width:600px){
     #boot{padding:32px 20px}
     #main{padding:36px 20px 60px}
@@ -164,6 +249,13 @@
 </style>
 </head>
 <body class="ua">
+<div id="glitch-grid" aria-hidden="true">
+  <div class="gg-layer gg-base"></div>
+  <div class="gg-layer gg-slice-a"></div>
+  <div class="gg-layer gg-slice-b"></div>
+  <div class="gg-layer gg-flash"></div>
+</div>
+
 
 <div id="boot">
   <div class="bl" id="b0">SYSTEM INIT...</div>
