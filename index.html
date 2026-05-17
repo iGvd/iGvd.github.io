@@ -149,6 +149,37 @@
   body.ua .job[data-en]{display:none}body.ua .job[data-ua]{display:block}
   body.ua .li[data-en]{display:none}body.ua .li[data-ua]{display:flex}
 
+
+
+  /* SUBTLE SMILE SPHERE FIELD - background only, no images */
+  #smile-field{
+    position:fixed;
+    inset:0;
+    width:100vw;
+    height:100vh;
+    z-index:0;
+    pointer-events:none;
+    opacity:.72;
+  }
+
+  #main{
+    position:relative;
+    z-index:2;
+  }
+
+  .lang-toggle{z-index:150}
+  #bot{z-index:300}
+  #boot{z-index:200}
+  #protect{z-index:10000}
+
+  @media(max-width:600px){
+    #smile-field{opacity:.48}
+  }
+
+  @media(prefers-reduced-motion:reduce){
+    #smile-field{opacity:.26}
+  }
+
   @media(max-width:600px){
     #boot{padding:32px 20px}
     #main{padding:36px 20px 60px}
@@ -161,6 +192,7 @@
 </style>
 </head>
 <body class="ua">
+<canvas id="smile-field" aria-hidden="true"></canvas>
 
 <div id="boot">
   <div class="bl" id="b0">SYSTEM INIT...</div>
@@ -476,6 +508,185 @@ document.addEventListener('keydown',e=>{
     e.preventDefault();showProtect();
   }
 });
+
+
+
+// Subtle smile spheres: grey background pattern, eyes look at cursor near them
+(function(){
+  const canvas=document.getElementById('smile-field');
+  if(!canvas)return;
+
+  const ctx=canvas.getContext('2d',{alpha:true});
+  const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  let w=0,h=0,dpr=1,nodes=[];
+  const pointer={
+    x:window.innerWidth*.68,
+    y:window.innerHeight*.38,
+    tx:window.innerWidth*.68,
+    ty:window.innerHeight*.38,
+    active:false
+  };
+
+  function resize(){
+    dpr=Math.min(window.devicePixelRatio||1,2);
+    w=window.innerWidth;
+    h=window.innerHeight;
+    canvas.width=Math.floor(w*dpr);
+    canvas.height=Math.floor(h*dpr);
+    canvas.style.width=w+'px';
+    canvas.style.height=h+'px';
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    buildPattern();
+  }
+
+  function buildPattern(){
+    nodes=[];
+    const mobile=w<700;
+    const gap=mobile?190:260;
+    const r=mobile?58:82;
+    const cols=Math.ceil(w/gap)+2;
+    const rows=Math.ceil(h/gap)+2;
+    const offsetX=(w-(cols-1)*gap)/2;
+    const offsetY=(h-(rows-1)*gap)/2;
+
+    for(let row=0;row<rows;row++){
+      for(let col=0;col<cols;col++){
+        const stagger=(row%2)*gap*.5;
+        const x=offsetX+col*gap-stagger;
+        const y=offsetY+row*gap;
+        nodes.push({x,y,r,seed:(row*17+col*31)});
+      }
+    }
+  }
+
+  function setPointer(x,y,active=true){
+    pointer.tx=x;
+    pointer.ty=y;
+    pointer.active=active;
+  }
+
+  window.addEventListener('pointermove',e=>setPointer(e.clientX,e.clientY,true),{passive:true});
+  window.addEventListener('pointerleave',()=>{pointer.active=false},{passive:true});
+  window.addEventListener('touchmove',e=>{
+    if(e.touches&&e.touches[0])setPointer(e.touches[0].clientX,e.touches[0].clientY,true);
+  },{passive:true});
+  window.addEventListener('resize',resize,{passive:true});
+
+  function textMaskAlpha(x,y,r){
+    const main=document.getElementById('main');
+    if(!main)return 1;
+    const b=main.getBoundingClientRect();
+    const pad=w<700?28:70;
+    const inside=x+r>b.left-pad&&x-r<b.right+pad&&y+r>b.top-pad&&y-r<b.bottom+pad;
+    return inside?.28:1;
+  }
+
+  function drawSphere(n,time){
+    const dx=pointer.x-n.x;
+    const dy=pointer.y-n.y;
+    const dist=Math.hypot(dx,dy);
+    const influenceRadius=w<700?190:260;
+    const near=Math.max(0,1-dist/influenceRadius);
+    const mask=textMaskAlpha(n.x,n.y,n.r);
+    const drift=reduce?0:Math.sin(time*.00025+n.seed)*1.2;
+    const x=n.x+drift;
+    const y=n.y+Math.cos(time*.00022+n.seed)*drift;
+    const r=n.r;
+
+    // Extremely low contrast: visible outside text, almost hidden under main content.
+    const base=(0.028+near*0.075)*mask;
+    const line=(0.045+near*0.13)*mask;
+    const eyeA=(0.055+near*0.20)*mask;
+
+    ctx.save();
+    ctx.translate(x,y);
+
+    // Soft spherical body.
+    const g=ctx.createRadialGradient(-r*.34,-r*.42,0,0,0,r*1.05);
+    g.addColorStop(0,`rgba(255,255,255,${base*1.25})`);
+    g.addColorStop(.55,`rgba(255,255,255,${base*.58})`);
+    g.addColorStop(1,'rgba(255,255,255,0)');
+    ctx.fillStyle=g;
+    ctx.beginPath();
+    ctx.arc(0,0,r,0,Math.PI*2);
+    ctx.fill();
+
+    // Globe/sci-fi sphere lines.
+    ctx.strokeStyle=`rgba(255,255,255,${line})`;
+    ctx.lineWidth=.75;
+    ctx.beginPath();
+    ctx.arc(0,0,r,0,Math.PI*2);
+    ctx.stroke();
+
+    ctx.strokeStyle=`rgba(255,255,255,${line*.72})`;
+    ctx.beginPath();
+    ctx.ellipse(0,0,r*.42,r,0,0,Math.PI*2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.ellipse(0,0,r*.78,r*.26,0,0,Math.PI*2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.ellipse(0,0,r*.92,r*.52,0,0,Math.PI*2);
+    ctx.stroke();
+
+    // Eyes look only when cursor is near. Far away they are faint/centered.
+    const ang=Math.atan2(pointer.y-y,pointer.x-x);
+    const look=near>0?near:0;
+    const eyeY=-r*.16;
+    const eyeGap=r*.36;
+    const eyeW=r*.16;
+    const eyeH=r*.28;
+    const pupilShiftX=Math.cos(ang)*eyeW*.48*look;
+    const pupilShiftY=Math.sin(ang)*eyeH*.38*look;
+
+    function eye(cx){
+      ctx.save();
+      ctx.translate(cx,eyeY);
+      ctx.fillStyle=`rgba(255,255,255,${eyeA*.75})`;
+      ctx.beginPath();
+      ctx.ellipse(0,0,eyeW,eyeH,0,0,Math.PI*2);
+      ctx.fill();
+
+      ctx.fillStyle=`rgba(8,8,8,${(.35+near*.32)*mask})`;
+      ctx.beginPath();
+      ctx.ellipse(pupilShiftX,pupilShiftY,eyeW*.38,eyeH*.44,0,0,Math.PI*2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    eye(-eyeGap);
+    eye(eyeGap);
+
+    // Smile appears only near cursor; otherwise almost invisible.
+    if(near>.12){
+      ctx.strokeStyle=`rgba(255,255,255,${near*.10*mask})`;
+      ctx.lineWidth=1;
+      ctx.beginPath();
+      ctx.arc(0,r*.12,r*.44,.16*Math.PI,.84*Math.PI);
+      ctx.stroke();
+    }
+
+    ctx.restore();
+  }
+
+  function frame(time){
+    ctx.clearRect(0,0,w,h);
+    pointer.x+=(pointer.tx-pointer.x)*(reduce?.22:.075);
+    pointer.y+=(pointer.ty-pointer.y)*(reduce?.22:.075);
+
+    if(!pointer.active&&!reduce){
+      pointer.tx=w*.62+Math.sin(time*.00018)*w*.18;
+      pointer.ty=h*.42+Math.cos(time*.00016)*h*.16;
+    }
+
+    nodes.forEach(n=>drawSphere(n,time||0));
+    if(!reduce)requestAnimationFrame(frame);
+  }
+
+  resize();
+  frame(0);
+})();
 
 // Date
 const d=new Date();
