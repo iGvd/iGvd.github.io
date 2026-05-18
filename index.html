@@ -13,169 +13,70 @@
   *{margin:0;padding:0;box-sizing:border-box}
   html{background:var(--bg)}
   body{font-family:'Share Tech Mono',monospace;background:var(--bg);color:var(--fg);min-height:100vh;overflow-x:hidden}
-  body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,var(--scan) 2px,var(--scan) 4px);pointer-events:none;z-index:100}
-  body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,0.65) 100%);pointer-events:none;z-index:99}
 
+  /* background noise + scan */
+  body::before{content:'';position:fixed;inset:0;background:
+    radial-gradient(circle at 20% 20%, rgba(255,255,255,0.018) 0 1px, transparent 1px 100%),
+    radial-gradient(circle at 80% 30%, rgba(255,255,255,0.012) 0 1px, transparent 1px 120%),
+    radial-gradient(circle at 40% 70%, rgba(255,255,255,0.014) 0 1px, transparent 1px 90%),
+    repeating-linear-gradient(0deg,transparent,transparent 2px,var(--scan) 2px,var(--scan) 4px),
+    repeating-linear-gradient(90deg, rgba(255,255,255,.008) 0 1px, transparent 1px 3px);
+    pointer-events:none;z-index:100;opacity:.96}
+  body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at center,transparent 52%,rgba(0,0,0,0.68) 100%);pointer-events:none;z-index:99}
 
-
-  /* BACKGROUND: BIOS SCI-FI GRID + TEXT-SAFE GLITCH */
-  #glitch-grid{
-    position:fixed;
-    inset:0;
-    z-index:0;
-    pointer-events:none;
-    overflow:hidden;
-    opacity:.62;
-    isolation:isolate;
-  }
-
-  #glitch-grid::before{
-    content:'';
-    position:absolute;
-    inset:0;
-    background:
-      radial-gradient(ellipse at center, transparent 0%, transparent 44%, rgba(0,0,0,.30) 72%, rgba(0,0,0,.78) 100%),
-      linear-gradient(180deg, rgba(0,0,0,.20), rgba(0,0,0,.92));
-    z-index:4;
-  }
-
-  .gg-layer{
-    position:absolute;
-    inset:-18vh -18vw;
-    will-change:transform,opacity,clip-path;
-  }
-
-  .gg-base,
-  .gg-slice{
-    background:
-      radial-gradient(circle at 50% 75%, rgba(255,255,255,.18) 0 1px, transparent 2px),
-      linear-gradient(115deg, transparent 0 48.7%, rgba(255,255,255,.16) 49%, transparent 49.4% 100%),
-      linear-gradient(65deg, transparent 0 49%, rgba(255,255,255,.10) 49.25%, transparent 49.7% 100%),
-      repeating-linear-gradient(90deg, rgba(255,255,255,.105) 0 1px, transparent 1px 92px),
-      repeating-linear-gradient(0deg, rgba(255,255,255,.075) 0 1px, transparent 1px 70px);
-    background-size:
-      92px 70px,
-      100% 100%,
-      100% 100%,
-      92px 70px,
-      92px 70px;
-    transform:perspective(760px) rotateX(64deg) translateY(23vh) scale(1.58);
-    transform-origin:center bottom;
-  }
-
-  .gg-base{
-    opacity:.48;
-    animation:gridDrift 18s linear infinite;
-  }
-
-  .gg-noise{
-    z-index:2;
-    opacity:.18;
-    background:
-      repeating-linear-gradient(0deg, transparent 0 6px, rgba(255,255,255,.06) 6px 7px, transparent 7px 12px),
-      repeating-linear-gradient(90deg, transparent 0 18px, rgba(255,255,255,.025) 18px 19px, transparent 19px 42px);
-    mix-blend-mode:screen;
-    animation:noiseJitter 5.4s steps(2,end) infinite;
-  }
-
-  .gg-slice{
-    z-index:3;
-    opacity:0;
-    mix-blend-mode:screen;
-    filter:brightness(1.55) contrast(1.15);
-  }
-
-  .gg-slice-a{animation:bgGlitchA 3.6s steps(1,end) infinite}
-  .gg-slice-b{animation:bgGlitchB 5.1s steps(1,end) infinite}
-  .gg-slice-c{animation:bgGlitchC 6.8s steps(1,end) infinite}
-
-  .gg-hardline{
-    z-index:4;
-    opacity:0;
-    mix-blend-mode:screen;
-    background:
-      repeating-linear-gradient(0deg, transparent 0 18px, rgba(255,255,255,.16) 18px 19px, transparent 19px 42px),
-      linear-gradient(90deg, transparent 0 14%, rgba(255,255,255,.12) 14.4%, transparent 15.2% 100%);
-    animation:bgHardline 4.35s steps(1,end) infinite;
-  }
-
-  .gg-flash{
-    z-index:5;
-    opacity:0;
-    background:
-      linear-gradient(90deg, transparent 0 7%, rgba(255,255,255,.20) 7.4%, transparent 8.6% 100%),
-      linear-gradient(180deg, transparent 0 48%, rgba(255,255,255,.18) 48.2%, transparent 49.6% 100%);
-    animation:bgGlitchFlash 5.8s steps(1,end) infinite;
-  }
-
-  @keyframes gridDrift{
-    0%{transform:perspective(760px) rotateX(64deg) translateY(23vh) translateX(0) scale(1.58)}
-    100%{transform:perspective(760px) rotateX(64deg) translateY(23vh) translateX(-92px) scale(1.58)}
-  }
-
-  @keyframes noiseJitter{
-    0%,100%{transform:translate3d(0,0,0)}
-    38%{transform:translate3d(3px,-1px,0)}
-    39%{transform:translate3d(-4px,1px,0)}
-    40%{transform:translate3d(0,0,0)}
-    72%{transform:translate3d(-2px,0,0)}
-    73%{transform:translate3d(4px,1px,0)}
-    74%{transform:translate3d(0,0,0)}
-  }
+  /* clean grid glitch background */
+  #glitch-grid{position:fixed;inset:-4vh -4vw;z-index:0;pointer-events:none;overflow:hidden;opacity:.72}
+  .gg-layer{position:absolute;inset:0;transform:perspective(980px) rotateX(74deg) translateY(17vh) scale(1.22);transform-origin:center bottom;background:
+    linear-gradient(to bottom, rgba(255,255,255,.02), rgba(255,255,255,.005) 24%, rgba(255,255,255,.01) 55%, rgba(255,255,255,.018)),
+    repeating-linear-gradient(90deg, rgba(255,255,255,.09) 0 1px, transparent 1px 108px),
+    repeating-linear-gradient(0deg, rgba(255,255,255,.075) 0 1px, transparent 1px 78px);
+    filter:blur(.15px)}
+  .gg-base{opacity:.32}
+  .gg-slice-a,.gg-slice-b,.gg-slice-c,.gg-flash{mix-blend-mode:screen}
+  .gg-slice-a{opacity:.42;animation:bgGlitchA 3.8s steps(1,end) infinite}
+  .gg-slice-b{opacity:.34;animation:bgGlitchB 5.4s steps(1,end) infinite}
+  .gg-slice-c{opacity:.30;animation:bgGlitchC 6.6s steps(1,end) infinite}
+  .gg-flash{opacity:0;animation:bgGlitchFlash 2.9s steps(1,end) infinite}
 
   @keyframes bgGlitchA{
-    0%,20%,100%{opacity:0;clip-path:polygon(0 0,100% 0,100% 0,0 0)}
-    21%{opacity:.86;clip-path:polygon(0 12%,100% 12%,100% 20%,0 20%);transform:perspective(760px) rotateX(64deg) translateY(23vh) translateX(34px) scale(1.58)}
-    22%{opacity:.62;clip-path:polygon(0 42%,100% 42%,100% 46%,0 46%);transform:perspective(760px) rotateX(64deg) translateY(23vh) translateX(-38px) scale(1.58)}
-    23%{opacity:.78;clip-path:polygon(0 67%,100% 67%,100% 78%,0 78%);transform:perspective(760px) rotateX(64deg) translateY(23vh) translateX(22px) scale(1.58)}
-    24%{opacity:.42;clip-path:polygon(0 84%,100% 84%,100% 87%,0 87%);transform:perspective(760px) rotateX(64deg) translateY(23vh) translateX(-18px) scale(1.58)}
-    25%{opacity:0;clip-path:polygon(0 0,100% 0,100% 0,0 0)}
+    0%,12%,100%{clip-path:polygon(0 0,100% 0,100% 0,0 0);transform:perspective(980px) rotateX(74deg) translateY(17vh) translateX(0) scale(1.22)}
+    13%{clip-path:polygon(0 6%,100% 6%,100% 11%,0 11%);transform:perspective(980px) rotateX(74deg) translateY(17vh) translateX(18px) scale(1.22)}
+    14%{clip-path:polygon(0 17%,100% 17%,100% 19%,0 19%);transform:perspective(980px) rotateX(74deg) translateY(17vh) translateX(-14px) scale(1.22)}
+    15%{clip-path:polygon(0 27%,100% 27%,100% 34%,0 34%);transform:perspective(980px) rotateX(74deg) translateY(17vh) translateX(11px) scale(1.22)}
+    16%{clip-path:polygon(0 43%,100% 43%,100% 47%,0 47%);transform:perspective(980px) rotateX(74deg) translateY(17vh) translateX(-9px) scale(1.22)}
+    17%{clip-path:polygon(0 63%,100% 63%,100% 69%,0 69%);transform:perspective(980px) rotateX(74deg) translateY(17vh) translateX(13px) scale(1.22)}
+    18%{clip-path:polygon(0 82%,100% 82%,100% 86%,0 86%);transform:perspective(980px) rotateX(74deg) translateY(17vh) translateX(-7px) scale(1.22)}
   }
-
   @keyframes bgGlitchB{
-    0%,55%,100%{opacity:0;clip-path:polygon(0 0,100% 0,100% 0,0 0)}
-    56%{opacity:.70;clip-path:polygon(0 26%,100% 26%,100% 31%,0 31%);transform:perspective(760px) rotateX(64deg) translateY(23vh) translateX(-44px) scale(1.58)}
-    57%{opacity:.88;clip-path:polygon(0 50%,100% 50%,100% 59%,0 59%);transform:perspective(760px) rotateX(64deg) translateY(23vh) translateX(42px) scale(1.58)}
-    58%{opacity:.52;clip-path:polygon(0 73%,100% 73%,100% 77%,0 77%);transform:perspective(760px) rotateX(64deg) translateY(23vh) translateX(-24px) scale(1.58)}
-    59%{opacity:0;clip-path:polygon(0 0,100% 0,100% 0,0 0)}
+    0%,29%,100%{clip-path:polygon(0 0,100% 0,100% 0,0 0);transform:perspective(980px) rotateX(74deg) translateY(17vh) translateX(0) scale(1.22)}
+    30%{clip-path:polygon(0 4%,100% 4%,100% 8%,0 8%);transform:perspective(980px) rotateX(74deg) translateY(17vh) translateX(-21px) scale(1.22)}
+    31%{clip-path:polygon(0 22%,100% 22%,100% 28%,0 28%);transform:perspective(980px) rotateX(74deg) translateY(17vh) translateX(13px) scale(1.22)}
+    32%{clip-path:polygon(0 49%,100% 49%,100% 55%,0 55%);transform:perspective(980px) rotateX(74deg) translateY(17vh) translateX(-17px) scale(1.22)}
+    33%{clip-path:polygon(0 71%,100% 71%,100% 74%,0 74%);transform:perspective(980px) rotateX(74deg) translateY(17vh) translateX(9px) scale(1.22)}
+    34%{clip-path:polygon(0 91%,100% 91%,100% 94%,0 94%);transform:perspective(980px) rotateX(74deg) translateY(17vh) translateX(-10px) scale(1.22)}
   }
-
   @keyframes bgGlitchC{
-    0%,82%,100%{opacity:0;clip-path:polygon(0 0,100% 0,100% 0,0 0)}
-    83%{opacity:.76;clip-path:polygon(0 8%,100% 8%,100% 11%,0 11%);transform:perspective(760px) rotateX(64deg) translateY(23vh) translateX(52px) scale(1.58)}
-    84%{opacity:.68;clip-path:polygon(0 34%,100% 34%,100% 36%,0 36%);transform:perspective(760px) rotateX(64deg) translateY(23vh) translateX(-46px) scale(1.58)}
-    85%{opacity:.84;clip-path:polygon(0 61%,100% 61%,100% 66%,0 66%);transform:perspective(760px) rotateX(64deg) translateY(23vh) translateX(30px) scale(1.58)}
-    86%{opacity:0;clip-path:polygon(0 0,100% 0,100% 0,0 0)}
+    0%,57%,100%{clip-path:polygon(0 0,100% 0,100% 0,0 0);transform:perspective(980px) rotateX(74deg) translateY(17vh) translateX(0) scale(1.22)}
+    58%{clip-path:polygon(0 12%,100% 12%,100% 13%,0 13%);transform:perspective(980px) rotateX(74deg) translateY(17vh) translateX(22px) scale(1.22)}
+    59%{clip-path:polygon(0 36%,100% 36%,100% 42%,0 42%);transform:perspective(980px) rotateX(74deg) translateY(17vh) translateX(-12px) scale(1.22)}
+    60%{clip-path:polygon(0 66%,100% 66%,100% 72%,0 72%);transform:perspective(980px) rotateX(74deg) translateY(17vh) translateX(16px) scale(1.22)}
+    61%{clip-path:polygon(0 84%,100% 84%,100% 89%,0 89%);transform:perspective(980px) rotateX(74deg) translateY(17vh) translateX(-8px) scale(1.22)}
   }
 
-  @keyframes bgHardline{
-    0%,44%,100%{opacity:0;clip-path:polygon(0 0,100% 0,100% 0,0 0);transform:translate3d(0,0,0)}
-    45%{opacity:.34;clip-path:polygon(0 18%,100% 18%,100% 24%,0 24%);transform:translate3d(-32px,0,0)}
-    46%{opacity:.24;clip-path:polygon(0 48%,100% 48%,100% 54%,0 54%);transform:translate3d(38px,0,0)}
-    47%{opacity:.30;clip-path:polygon(0 76%,100% 76%,100% 83%,0 83%);transform:translate3d(-22px,0,0)}
-    48%{opacity:0;clip-path:polygon(0 0,100% 0,100% 0,0 0)}
+  .gg-hardline{position:absolute;inset:0;opacity:.36;mix-blend-mode:screen;background:repeating-linear-gradient(0deg, transparent 0 13px, rgba(255,255,255,.18) 13px 14px, transparent 14px 47px);animation:bgHardGlitch 1.55s steps(1,end) infinite;clip-path:polygon(0 0,100% 0,100% 0,0 0)}
+  @keyframes bgHardGlitch{
+    0%,70%,100%{opacity:0;clip-path:polygon(0 0,100% 0,100% 0,0 0);transform:translateX(0)}
+    71%{opacity:.34;clip-path:polygon(0 12%,100% 12%,100% 16%,0 16%);transform:translateX(24px)}
+    72%{opacity:.24;clip-path:polygon(0 37%,100% 37%,100% 40%,0 40%);transform:translateX(-18px)}
+    73%{opacity:.30;clip-path:polygon(0 58%,100% 58%,100% 62%,0 62%);transform:translateX(15px)}
+    74%{opacity:.22;clip-path:polygon(0 79%,100% 79%,100% 82%,0 82%);transform:translateX(-12px)}
   }
 
   @keyframes bgGlitchFlash{
-    0%,66%,100%{opacity:0;transform:translate3d(0,0,0)}
-    67%{opacity:.34;transform:translate3d(34px,0,0)}
-    68%{opacity:.12;transform:translate3d(-18px,0,0)}
-    69%{opacity:0;transform:translate3d(0,0,0)}
-  }
-
-  #main{position:relative;z-index:2}
-
-  @media(max-width:600px){
-    #glitch-grid{opacity:.36}
-    .gg-base,.gg-slice{
-      transform:perspective(520px) rotateX(60deg) translateY(25vh) scale(1.38);
-      background-size:74px 58px,100% 100%,100% 100%,74px 58px,74px 58px;
-    }
-  }
-
-  @media(prefers-reduced-motion:reduce){
-    .gg-base,.gg-noise,.gg-slice-a,.gg-slice-b,.gg-slice-c,.gg-hardline,.gg-flash{animation:none}
-    #glitch-grid{opacity:.32}
+    0%,24%,100%{opacity:0;clip-path:polygon(0 0,100% 0,100% 0,0 0)}
+    25%{opacity:.18;clip-path:polygon(0 18%,100% 18%,100% 19%,0 19%);transform:perspective(980px) rotateX(74deg) translateY(17vh) translateX(24px) scale(1.22)}
+    26%{opacity:.13;clip-path:polygon(0 52%,100% 52%,100% 53%,0 53%);transform:perspective(980px) rotateX(74deg) translateY(17vh) translateX(-20px) scale(1.22)}
+    27%{opacity:.16;clip-path:polygon(0 78%,100% 78%,100% 79%,0 79%);transform:perspective(980px) rotateX(74deg) translateY(17vh) translateX(18px) scale(1.22)}
   }
 
   /* BOOT */
@@ -197,11 +98,29 @@
   .lang-btn:hover:not(.active){border-color:var(--mid);color:var(--fg)}
 
   /* MAIN */
-  #main{opacity:0;transition:opacity .9s ease;max-width:840px;margin:0 auto;padding:52px 40px 80px}
+  #main{position:relative;z-index:2;opacity:0;transition:opacity .9s ease;max-width:840px;margin:0 auto;padding:52px 40px 80px}
   #main.show{opacity:1}
 
   .header{border-bottom:1px solid var(--line);padding-bottom:28px;margin-bottom:36px}
   .name{font-family:'Space Mono',monospace;font-size:30px;font-weight:700;color:var(--accent);letter-spacing:-.5px;opacity:0;animation:fadeup .5s ease .1s forwards}
+  .glitch-name{position:relative;display:inline-block;text-shadow:0 0 1px rgba(255,255,255,.25)}
+  .glitch-name::before,.glitch-name::after{content:attr(data-text);position:absolute;inset:0;pointer-events:none;opacity:.42;mix-blend-mode:screen;overflow:hidden;color:var(--accent)}
+  .glitch-name::before{transform:translateX(1px);clip-path:polygon(0 18%,100% 18%,100% 29%,0 29%);animation:nameGlitchA 4.2s steps(1,end) infinite}
+  .glitch-name::after{transform:translateX(-1px);clip-path:polygon(0 62%,100% 62%,100% 72%,0 72%);animation:nameGlitchB 5.7s steps(1,end) infinite}
+  .glitch-name:hover::before,.glitch-name:hover::after{opacity:.72;animation-duration:.9s}
+  @keyframes nameGlitchA{
+    0%,82%,100%{clip-path:polygon(0 0,100% 0,100% 0,0 0);transform:translateX(0)}
+    83%{clip-path:polygon(0 8%,100% 8%,100% 18%,0 18%);transform:translateX(3px)}
+    84%{clip-path:polygon(0 35%,100% 35%,100% 42%,0 42%);transform:translateX(-2px)}
+    85%{clip-path:polygon(0 69%,100% 69%,100% 77%,0 77%);transform:translateX(2px)}
+    86%{clip-path:polygon(0 22%,100% 22%,100% 26%,0 26%);transform:translateX(-1px)}
+  }
+  @keyframes nameGlitchB{
+    0%,71%,100%{clip-path:polygon(0 0,100% 0,100% 0,0 0);transform:translateX(0)}
+    72%{clip-path:polygon(0 14%,100% 14%,100% 20%,0 20%);transform:translateX(-3px)}
+    73%{clip-path:polygon(0 48%,100% 48%,100% 56%,0 56%);transform:translateX(2px)}
+    74%{clip-path:polygon(0 80%,100% 80%,100% 88%,0 88%);transform:translateX(-2px)}
+  }
   .jtitle{font-size:11px;color:var(--mid);letter-spacing:3px;text-transform:uppercase;margin-top:6px;opacity:0;animation:fadeup .5s ease .25s forwards}
   .meta{display:flex;flex-wrap:wrap;gap:18px;margin-top:14px;font-size:11px;color:var(--dim);opacity:0;animation:fadeup .5s ease .4s forwards}
   .meta a{color:var(--mid);text-decoration:none;border-bottom:1px solid var(--dim);padding-bottom:1px;transition:color .15s,border-color .15s}
@@ -256,25 +175,20 @@
   /* BOT */
   #bot{position:fixed;bottom:24px;right:32px;z-index:300;display:none;flex-direction:column;align-items:flex-end;gap:12px}
   #bot.visible{display:flex}
-
   #bot-toggle{background:var(--bg);border:1px solid var(--mid);color:var(--fg);font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;padding:10px 16px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:8px}
   #bot-toggle:hover{border-color:var(--accent);color:var(--accent)}
   .bot-dot{width:6px;height:6px;border-radius:50%;background:#4ade80;animation:pulse 2s infinite}
   @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
-
   #bot-window{display:none;width:340px;border:1px solid var(--line);background:rgba(8,8,8,0.97);flex-direction:column;overflow:hidden}
   #bot-window.open{display:flex}
-
   .bot-header{padding:12px 16px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
   .bot-title{font-size:10px;letter-spacing:2px;color:var(--mid)}
   .bot-close{background:none;border:none;color:var(--dim);font-size:16px;cursor:pointer;line-height:1;transition:color .15s}
   .bot-close:hover{color:var(--accent)}
-
   .bot-messages{height:280px;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;scroll-behavior:smooth}
   .bot-messages::-webkit-scrollbar{width:2px}
   .bot-messages::-webkit-scrollbar-track{background:transparent}
   .bot-messages::-webkit-scrollbar-thumb{background:var(--dim)}
-
   .msg{font-size:11px;line-height:1.7;max-width:85%}
   .msg.bot{color:var(--fg);align-self:flex-start}
   .msg.bot::before{content:'> ';color:var(--dim)}
@@ -282,7 +196,6 @@
   .msg.typing{color:var(--dim)}
   .msg.typing::after{content:'...';animation:dots 1.2s infinite}
   @keyframes dots{0%{content:'.'}33%{content:'..'}66%{content:'...'}100%{content:'.'}}
-
   .bot-input-row{border-top:1px solid var(--line);display:flex}
   .bot-input{flex:1;background:none;border:none;padding:12px 16px;font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--fg);outline:none}
   .bot-input::placeholder{color:var(--dim)}
@@ -299,20 +212,29 @@
   .p-close:hover{border-color:var(--accent);color:var(--accent)}
 
   .footer{margin-top:48px;padding-top:16px;border-top:1px solid var(--line);display:flex;justify-content:space-between;font-size:9px;color:var(--dim);flex-wrap:wrap;gap:6px;opacity:0;animation:fadeup .5s ease 1.2s forwards}
-
   @keyframes fadeup{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
 
   /* Lang */
-  [data-ua]{display:none}[data-en]{display:block}
-  .sr[data-ua],.sr[data-en]{display:grid}
-  .ach[data-ua],.ach[data-en]{display:flex}
-  .job[data-ua],.job[data-en]{display:block}
-  .li[data-ua],.li[data-en]{display:flex}
-  body.ua [data-en]{display:none}body.ua [data-ua]{display:block}
-  body.ua .sr[data-en]{display:none}body.ua .sr[data-ua]{display:grid}
-  body.ua .ach[data-en]{display:none}body.ua .ach[data-ua]{display:flex}
-  body.ua .job[data-en]{display:none}body.ua .job[data-ua]{display:block}
-  body.ua .li[data-en]{display:none}body.ua .li[data-ua]{display:flex}
+  [data-ua]{display:none}
+  [data-en]{display:block}
+  .sr[data-en]{display:grid}
+  .ach[data-en]{display:flex}
+  .job[data-en]{display:block}
+  .li[data-en]{display:flex}
+
+  body.ua [data-en]{display:none!important}
+  body.ua [data-ua]{display:block!important}
+  body.ua .sr[data-ua]{display:grid!important}
+  body.ua .ach[data-ua]{display:flex!important}
+  body.ua .job[data-ua]{display:block!important}
+  body.ua .li[data-ua]{display:flex!important}
+
+  body.en [data-ua]{display:none!important}
+  body.en [data-en]{display:block!important}
+  body.en .sr[data-en]{display:grid!important}
+  body.en .ach[data-en]{display:flex!important}
+  body.en .job[data-en]{display:block!important}
+  body.en .li[data-en]{display:flex!important}
 
   @media(max-width:600px){
     #boot{padding:32px 20px}
@@ -322,22 +244,26 @@
     .lang-toggle{top:14px;right:14px}
     #bot{bottom:16px;right:16px}
     #bot-window{width:calc(100vw - 32px)}
+    #glitch-grid{opacity:.52}
+    .gg-layer{transform:perspective(760px) rotateX(71deg) translateY(19vh) scale(1.2)}
+  }
+
+  @media(prefers-reduced-motion:reduce){
+    #glitch-grid{opacity:.28}
+    .gg-slice-a,.gg-slice-b,.gg-slice-c,.gg-flash,.gg-hardline{animation:none;opacity:0}
   }
 </style>
 </head>
 <body class="ua">
 
-<!-- Background: readable BIOS sci-fi grid + glitch slices -->
 <div id="glitch-grid" aria-hidden="true">
   <div class="gg-layer gg-base"></div>
-  <div class="gg-layer gg-noise"></div>
-  <div class="gg-layer gg-slice gg-slice-a"></div>
-  <div class="gg-layer gg-slice gg-slice-b"></div>
-  <div class="gg-layer gg-slice gg-slice-c"></div>
-  <div class="gg-layer gg-hardline"></div>
+  <div class="gg-layer gg-slice-a"></div>
+  <div class="gg-layer gg-slice-b"></div>
+  <div class="gg-layer gg-slice-c"></div>
   <div class="gg-layer gg-flash"></div>
+  <div class="gg-hardline"></div>
 </div>
-
 
 <div id="boot">
   <div class="bl" id="b0">SYSTEM INIT...</div>
@@ -388,9 +314,9 @@
 
 <div id="main">
   <div class="header">
-    <div class="name" data-ua>Ігор Гведде</div>
-    <div class="name" data-en>Igor Gvedde</div>
-    <div class="jtitle" data-ua>Будівник ШІ-систем</div>
+    <div class="name glitch-name" data-text="Ігор Гведде" data-ua>Ігор Гведде</div>
+    <div class="name glitch-name" data-text="Igor Gvedde" data-en>Igor Gvedde</div>
+    <div class="jtitle" data-ua>Розробник ШІ-систем</div>
     <div class="jtitle" data-en>AI Systems Builder</div>
     <div class="meta">
       <a href="https://www.linkedin.com/in/gvedde/" target="_blank">linkedin</a>
@@ -466,7 +392,7 @@
   <div class="section" data-s>
     <div class="slabel" data-ua>Досвід</div>
     <div class="slabel" data-en>Experience</div>
-    <div class="job" data-ua><div class="jco">Division Digital Production</div><div class="jro">Будівник ШІ-систем / Motion Lead</div><div class="jpe">2022 - дотепер</div><ul class="jbu"><li>Покриваю ~75% усіх проєктів - фактично замінюю команду з 9 моушн-дизайнерів</li><li>Масштабую виробництво до ~1000 відео/тиждень через ШІ-пайплайни та автоматизацію</li><li>Розробляю шаблони, кастомні боти, генеративні процеси: зображення / відео / аудіо</li><li>R&amp;D: бета-системи детекції ШІ-контенту та аудіо-захисту</li></ul></div>
+    <div class="job" data-ua><div class="jco">Division Digital Production</div><div class="jro">Розробник ШІ-систем / Motion Lead</div><div class="jpe">2022 - дотепер</div><ul class="jbu"><li>Покриваю ~75% усіх проєктів - фактично замінюю команду з 9 моушн-дизайнерів</li><li>Масштабую виробництво до ~1000 відео/тиждень через ШІ-пайплайни та автоматизацію</li><li>Розробляю шаблони, кастомні боти, генеративні процеси: зображення / відео / аудіо</li><li>R&amp;D: бета-системи детекції ШІ-контенту та аудіо-захисту</li></ul></div>
     <div class="job" data-en><div class="jco">Division Digital Production</div><div class="jro">AI Systems Builder / Motion Lead</div><div class="jpe">2022 - Present</div><ul class="jbu"><li>Cover ~75% of all projects - functionally replacing a 9-person motion team</li><li>Scale output to ~1,000 videos/week via custom AI pipelines and automation</li><li>Build reusable templates, custom bots, generative workflows: image / video / audio</li><li>R&amp;D: built beta AI detection and audio-based AI protection tools</li></ul></div>
     <div class="job" data-ua><div class="jco">Shopping Mall Gulliver</div><div class="jro">Арт-директор, OOH / LED-екосистема</div><div class="jpe">~2021 - 2022</div><ul class="jbu"><li>Повна концептуальна візуальна ідентичність великого торгового центру</li><li>Суттєве зростання помітності у соцмережах та відвідуваності після ребрендингу</li></ul></div>
     <div class="job" data-en><div class="jco">Shopping Mall Gulliver</div><div class="jro">Art Director, OOH / LED Ecosystem</div><div class="jpe">~2021 - 2022</div><ul class="jbu"><li>Created full conceptual visual identity for a major retail destination</li><li>Significant growth in social media visibility and corporate footfall after rebrand</li></ul></div>
@@ -509,20 +435,18 @@
   </div>
 
   <div class="footer">
-    <span data-ua>ІГОР ГВЕДДЕ / БУДІВНИК ШІ-СИСТЕМ / КИЇВ UA</span>
+    <span data-ua>ІГОР ГВЕДДЕ / РОЗРОБНИК ШІ-СИСТЕМ / КИЇВ UA</span>
     <span data-en>IGOR GVEDDE / AI SYSTEMS BUILDER / KYIV UA</span>
     <span id="ts"></span>
   </div>
 </div>
 
 <script>
-
-
 const CV_CONTEXT = `Ти асистент на сайті-портфоліо Ігоря Гведде. Відповідай коротко і по суті, в стилі терміналу - без зайвих слів. Якщо питання українською - відповідай українською. Якщо англійською - англійською.
 
 ПРО ІГОРЯ:
 - Повне ім'я: Ігор Гведде / Igor Gvedde
-- Посада: AI Systems Builder (Будівник ШІ-систем)
+- Посада: AI Systems Builder (Розробник ШІ-систем)
 - Локація: Київ, Україна. Відкритий до remote/проєктної роботи
 - Зарплатні очікування: $5000-6000/міс
 
@@ -562,7 +486,6 @@ const CV_CONTEXT = `Ти асистент на сайті-портфоліо І�
 
 МОВИ: Українська (рідна), Англійська B1, Іспанська A1`;
 
-// Boot
 [['b0',0],['b1',280],['b2',560],['b3',840],['b4',1100],['b5',1380],['b6',1650]].forEach(([id,d])=>{
   setTimeout(()=>{
     const e=document.getElementById(id);
@@ -581,56 +504,43 @@ setTimeout(()=>{
   },750);
 },2600);
 
-// Lang
 function setLang(l){
   document.body.className=l;
-  document.documentElement.lang = l === 'ua' ? 'uk' : 'en';
-  document.title = l === 'ua'
-    ? 'Ігор Гведде - AI Systems Builder'
-    : 'Igor Gvedde - AI Systems Builder';
   document.getElementById('btnUA').classList.toggle('active',l==='ua');
   document.getElementById('btnEN').classList.toggle('active',l==='en');
   const ph=document.getElementById('bot-in');
   if(ph)ph.placeholder=l==='ua'?'Напиши питання...':'Ask a question...';
+  document.documentElement.lang = l === 'ua' ? 'uk' : 'en';
+  document.title = l === 'ua' ? 'Ігор Гведде - AI Systems Builder' : 'Igor Gvedde - AI Systems Builder';
 }
 
-// Bot
 function toggleBot(){
   const w=document.getElementById('bot-window');
   w.classList.toggle('open');
 }
 
 const history=[];
-
 async function sendMsg(){
   const inp=document.getElementById('bot-in');
   const txt=inp.value.trim();
   if(!txt)return;
   inp.value='';
-
   const msgs=document.getElementById('bot-msgs');
-
   const uDiv=document.createElement('div');
   uDiv.className='msg user';
   uDiv.textContent=txt;
   msgs.appendChild(uDiv);
-
   const tDiv=document.createElement('div');
   tDiv.className='msg typing bot';
   tDiv.textContent=' ';
   msgs.appendChild(tDiv);
   msgs.scrollTop=msgs.scrollHeight;
-
   history.push({role:'user',parts:[{text:txt}]});
-
   try{
     const res=await fetch(`https://gvedde-bot.gveddesign.workers.dev/`,{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        system_instruction:{parts:[{text:CV_CONTEXT}]},
-        contents:history
-      })
+      body:JSON.stringify({system_instruction:{parts:[{text:CV_CONTEXT}]},contents:history})
     });
     const data=await res.json();
     const reply=data.candidates?.[0]?.content?.parts?.[0]?.text||(data.error?.message?'API ERR: '+data.error.message:JSON.stringify(data).slice(0,200));
@@ -644,7 +554,6 @@ async function sendMsg(){
   msgs.scrollTop=msgs.scrollHeight;
 }
 
-// Protect
 function showProtect(){
   const d=new Date();
   document.getElementById('pdata').textContent=`IP: ${Math.floor(Math.random()*255)}.${Math.floor(Math.random()*255)}.${Math.floor(Math.random()*255)}.${Math.floor(Math.random()*255)}\nTIME: ${d.toISOString()}\nSTATUS: REPORTED`;
@@ -658,7 +567,6 @@ document.addEventListener('keydown',e=>{
   }
 });
 
-// Date
 const d=new Date();
 document.getElementById('ts').textContent=d.getFullYear()+'.'+String(d.getMonth()+1).padStart(2,'0')+'.'+String(d.getDate()).padStart(2,'0');
 </script>
